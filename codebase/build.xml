@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<!--
+         File: build.xml
+      Purpose: Master build to generate jar files for various versions
+	           of the High Level Architecture (HLA) Interface Specification.
+			   These can be used within applications to avoid referencing
+			   any vendor-specific libraries.
+-->
+<project name="hla-ifspec" default="sandbox">
+	<description>
+		The HLA Interface Spec package generates jar files for various versions
+		of the HLA interface specification to be included in applications that
+		want to code to the HLA interface, but not reference RTI vendor-specific
+		jar files.
+	</description>
+
+	<!-- bring in the ant-contrib tasks -->
+<!--	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>-->
+
+	<!-- ================================================================================= -->
+	<!--                              Project-wide Properties                              -->
+	<!-- ================================================================================= -->
+	<!-- load the environment variables -->
+	<property environment="env"/>
+
+	<!-- Load property override files -->
+	<property file="local.properties"/>  <!-- local machine/user settings -->
+	<property file="build.properties"/>  <!-- project specific settings -->
+
+	<!-- get date and time information -->
+	<tstamp><format property="YEAR" pattern="yyyy"/></tstamp>
+
+	<!-- Version information. Override these values in build.properties -->
+	<property name="build.longname"         value="Unknown"/> <!-- override in local/build.properties -->
+	<property name="build.shortname"        value="unknown"/> <!-- override in local/build.properties -->
+	<property name="build.version"          value=""/>        <!-- override in local/build.properties -->
+	<property name="build.number"           value="0"/>       <!-- overridden from command line -->
+	<!--<property name="license"                location="resources/dist/common/LICENSE.${ant.project.name}"/>-->
+	<!-- Distribution Name - compiled from information above -->
+	<property name="dist.name"              value="${build.shortname}-${build.version}.${build.number}"/>
+	<echo>Build Version: ${build.shortname}-${build.version} (build ${build.number})</echo>
+
+	<!-- Java compiler version defaults -->
+	<property name="java.compiler.source"   value="1.8"/> <!-- override in local/build.properties -->
+	<property name="java.compiler.target"   value="1.8"/> <!-- override in local/build.properties -->
+
+	<!-- =========================================================== -->
+	<!--          Locations, Resources and Build Directories         -->
+	<!-- =========================================================== -->
+	<property name="src.dir"                   location="src"/>
+	<property name="resources.dir"             location="resources"/>
+	<property name="resources.dist.dir"        location="${resources.dir}/dist"/>
+
+	<property name="build.dir"              location="build"/>
+	<property name="dist.dir"               location="dist"/>
+	<property name="sandbox.dir"            location="${dist.dir}/${dist.name}"/>
+
+	<!-- ================================================================================= -->
+	<!--                                  Master Targets                                   -->
+	<!-- ================================================================================= -->
+	<target name="compile" depends="ieee1516e.compile"/>
+	<target name="sandbox" depends="ieee1516e.sandbox"/>
+
+	<target name="clean">
+		<!-- Remove any top-level directories that might need to go -->
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+	</target>
+
+	<!-- ================================================================================= -->
+	<!--                             IEEE 1516-2010 Targets                                -->
+	<!-- ================================================================================= -->
+	<!-- Let's start with some properties -->
+	<property name="ieee1516e.src.dir"  location="${src.dir}/ieee1516e"/>
+	<property name="ieee1516e.classes.dir" location="${build.dir}/ieee1516e"/>
+	
+	<!-- Compile Target -->
+	<target name="ieee1516e.compile">
+		<mkdir dir="${ieee1516e.classes.dir}"/>
+
+		<!-- do the compile -->
+		<javac srcdir="${ieee1516e.src.dir}"
+			   destdir="${ieee1516e.classes.dir}"
+			   debug="true"
+			   debuglevel="lines,vars,source"
+			   source="1.8"
+			   target="1.8"
+			   includeAntRuntime="false">
+		</javac>
+	</target>
+
+	<!-- JAR-File Prep Target -->
+	<target name="ieee1516e.sandbox" depends="ieee1516e.compile">
+		<!-- Make sure we have somewhere to put everything -->
+		<mkdir dir="${sandbox.dir}"/>
+
+		<!-- Build the Jar -->
+		<jar destfile="${sandbox.dir}/hla-ieee1516e.jar">
+			<!-- collector code -->
+			<fileset dir="${ieee1516e.classes.dir}" includes="**/*.class"/>
+
+			<!-- internal jar resources -->
+			<!--<fileset dir="${resources.jars.dir}/ieee1516e.jar" includes="**/*"/>-->
+
+			<!-- MANIFEST -->
+			<manifest>
+				<attribute name="Product"          value="IEEE 1516 High Level Architecture"/>
+				<attribute name="Product-Version"  value="1516.2010"/>
+				<attribute name="Built-By"         value="Open LVC"/>
+				<attribute name="Built-Date"       value="${TODAY}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- ================================================================================= -->
+	<!--                                 Installer Targets                                 -->
+	<!-- ================================================================================= -->
+	<target name="installer">
+		<!-- generate the tarball with the sandbox and the JRE in it -->
+		<!-- we handle lib/bin separately so we can ensure only 64-bit stuff gets in -->
+		<zip destfile="${dist.dir}/${dist.name}.zip">
+			<zipfileset dir="${sandbox.dir}"
+			            includes="**/*"
+			            excludes=""
+			            prefix="${dist.name}"/>
+		</zip>
+	</target>
+
+</project>
+
