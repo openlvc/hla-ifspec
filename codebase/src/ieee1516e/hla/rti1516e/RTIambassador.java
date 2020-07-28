@@ -39,6 +39,7 @@ import java.util.Set;
  * RTI implementer must implement this.
  */
 
+@SuppressWarnings("rawtypes")
 public interface RTIambassador {
 
 ////////////////////////////////////

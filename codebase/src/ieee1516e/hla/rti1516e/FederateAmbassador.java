@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * Federate must implement this interface.
  */
-
+@SuppressWarnings("rawtypes")
 public interface FederateAmbassador {
 
 ////////////////////////////////////

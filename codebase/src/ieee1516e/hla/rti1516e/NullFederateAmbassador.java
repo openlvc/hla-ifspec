@@ -13,6 +13,7 @@ import hla.rti1516e.exceptions.FederateInternalError;
 
 import java.util.Set;
 
+@SuppressWarnings("rawtypes")
 public class NullFederateAmbassador implements FederateAmbassador {
    public void connectionLost(String faultDescription)
       throws FederateInternalError

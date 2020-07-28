@@ -17,6 +17,7 @@ package hla.rti1516e;
 
 import java.io.Serializable;
 
+@SuppressWarnings("rawtypes")
 public final class TimeQueryReturn
    implements Serializable {
    public TimeQueryReturn(boolean tiv, LogicalTime lt)

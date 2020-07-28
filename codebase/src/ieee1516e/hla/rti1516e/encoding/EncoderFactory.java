@@ -12,6 +12,7 @@ package hla.rti1516e.encoding;
 /**
  * Factory for the various HLA data types.
  */
+@SuppressWarnings("unchecked")
 public interface EncoderFactory {
    HLAASCIIchar createHLAASCIIchar();
 

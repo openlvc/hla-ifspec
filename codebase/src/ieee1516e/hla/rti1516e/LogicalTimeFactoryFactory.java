@@ -20,6 +20,7 @@ import java.util.Set;
  *
  * @see ServiceRegistry
  */
+@SuppressWarnings("rawtypes")
 public class LogicalTimeFactoryFactory {
    /**
     * Locates and constructs a LogicalTimeFactory matching the specified name.
